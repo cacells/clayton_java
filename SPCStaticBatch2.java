@@ -60,7 +60,7 @@ public class SPCStaticBatch2 {
 			for(iterations=0; iterations<maxIters; iterations++){
 				if(iterations==0)experiment.stain();// stain all cells at start
 
-				experiment.iterateandcount(true);
+				experiment.iterateandcount_random(true);
 
 				/*if (iterations%2==0){
 					drawCALineage();

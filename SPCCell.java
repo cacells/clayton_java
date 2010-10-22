@@ -115,7 +115,7 @@ class SPCCell{
         	b = nlist.remove(a);//use the value at that index and make the list smaller
 			cHold = home.getNeighbour(b);
 			if(cHold.isavail){ // If neighbour is available for takeover
-				if (rand.nextDouble()<=scRate){//does we prolif?
+				if (rand.nextDouble()<scRate){//does we prolif?
 					cHold.growth(this);// proliferate
 					return true;// and stop search
 				}
@@ -138,7 +138,7 @@ class SPCCell{
 			cHold = home.getNeighbour(b);
 			if(cHold.isavail){ // If neighbour is available for takeover
 				//debug System.out.print("1 ");
-				if (rand.nextDouble()<=scRate){//do we prolif?
+				if (rand.nextDouble()<scRate){//do we prolif?
 					//debug System.out.println("1 ");
 					cHold.growthandcount(this);// proliferate
 					return true;// and stop search
@@ -158,7 +158,7 @@ class SPCCell{
 		int a,b;
 		SPCCell cHold;
 		boolean found = true;
-		if (rand.nextDouble()<=scRate){//do we prolif?
+		if (rand.nextDouble()<scRate){//do we prolif?
 			//find an available neighbour or grow upwards
 			for(int i=0;i<sizeA;i++){ // Loop from starting point through list of neighbours
 				a = rand.nextInt(nlist.size());//pick random list index
@@ -179,6 +179,24 @@ class SPCCell{
 		}	
 		return false;// Return false if no proliferating cell can be found 
 	}
+	
+	public boolean growandcountrandom(ArrayList <SPCCell> migrateArray){
+		SPCCell cHold;
+		boolean found = false;
+		if (rand.nextDouble()<scRate){//do we prolif?
+			//find an available neighbour or grow upwards
+			while (!found && migrateArray.size()>0){
+				cHold = migrateArray.remove(rand.nextInt(migrateArray.size()));
+				if(cHold.isavail){ // If neighbour is available for takeover
+					cHold.growthandcount(this);// proliferate
+					found = true;
+					return found;
+				}
+			}
+		}
+		return found;
+	}
+	
 	private void growup(){//grow upwards because there is no space here...
 		totalproliferations++;
 		prolifcounts[type]++;

@@ -19,7 +19,7 @@ public class SPCGridStatic {
 	private Random rand = new Random();
 	public static int maxlineage;//probably static is  unnecessary
 	public int gsize;
-	public boolean writetogrid = false,precheck=true;
+	public static boolean writetogrid = false,precheck=true,migrateanywhere = true;;
 	public static boolean smallcolony=false,forcinggrow=false;
 	public int [] SCs,cellclonecount,clonesizecount;
 	public int SCcount=0;
@@ -315,6 +315,75 @@ public class SPCGridStatic {
 		}
 	}
 
+	public void iterateandcount_random(boolean printit) {
+		//beth: 
+		int[] colonies = new int[maxlineage];
+		int logval,csc;
+		boolean needstogrow;
+
+        SPCCell cHold;
+		// Create a list to hold cells that are spaces or have the capacity to detach
+        ArrayList<SPCCell> growArray = new ArrayList<SPCCell>();
+        ArrayList<SPCCell> migrateArray = new ArrayList<SPCCell>();
+        
+		SCcount=0;
+		countcolonies=0;
+		countviable=0;
+        for (int ii=0;ii<maxlineage;ii++) {
+        	SCs[ii] = 0;
+        	cellclonecount[ii] = 0;
+        }
+        for (int ii=0;ii<7;ii++)clonesizecount[ii] = 0;
+        
+        for (SPCCell c : tissue) { // loop through the tissue (ArrayList of cells)
+			colonies[c.lineage] = colonies[c.lineage] | 1;
+			cellclonecount[c.lineage]++;
+			if (c.type==1) {
+				growArray.add(c);
+				SCs[c.lineage] = SCs[c.lineage] | 1;
+				SCcount++;
+				//System.out.println("yo");
+			}
+			else {
+				migrateArray.add(c);
+			}
+		    c.maintainandcount(); // Calls each cell to maintain its state re: detach and/or grow
+			//if(c.type==1)growArray.add(c); // If cell is an SC, add to grow list
+			//if(c.canDetach)growArray.add(c);// If cell can detach add to grow list
+	    }
+		for(int ii=0;ii<maxlineage;ii++){
+			countcolonies = countcolonies+ colonies[ii];
+			countviable = countviable+ SCs[ii];
+			csc = cellclonecount[ii];
+			if (csc > 1){
+				logval = (int) (Math.log(csc-1)/log2);
+				if (logval > 6) logval = 6;
+                clonesizecount[logval]++;
+			}
+		}
+		if (printit) System.out.print(" "+countviable+"  "+countcolonies+"  "+SCcount);
+        //beth: go through the list and see if anything grows into those spots
+		while(growArray.size()>0){ // Randomly loop through the grow list
+			cHold=growArray.remove(rand.nextInt(growArray.size()));
+			if (migrateanywhere) 
+				cHold.growandcountrandom(migrateArray);
+			else {
+			if (precheck)
+				cHold.growandcountprecheck(forcinggrow);
+			else
+				cHold.growandcount();// Test to see if cell can be replaced by new proliferation
+			}
+
+		}
+		if (printit) {
+			System.out.print("  "+SPCCell.totalproliferations);
+
+		for (int ii=0;ii<7;ii++){
+			System.out.print(" "+clonesizecount[ii]);
+		}
+		System.out.println();
+		}
+	}
 
 public void writeGrid(){
 	try{

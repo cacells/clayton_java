@@ -199,7 +199,7 @@ public class SPCStatic extends JFrame implements Runnable {
 			for(iterations=0; iterations<maxIters; iterations++){
 				if(iterations==0)experiment.stain();// stain all cells at start
 
-				experiment.iterateandcount(false);
+				experiment.iterateandcount_random(false);
 				progressBar.setValue(iterations);
 
 				if (iterations%2==0){
