@@ -285,7 +285,7 @@ public class SPCGridStatic {
 			//if(c.type==1)growArray.add(c); // If cell is an SC, add to grow list
 			//if(c.canDetach)growArray.add(c);// If cell can detach add to grow list
 	    }
-		for(int ii=0;ii<maxlineage;ii++){
+		for(int ii=1;ii<maxlineage;ii++){
 			countcolonies = countcolonies+ colonies[ii];
 			countviable = countviable+ SCs[ii];
 			csc = cellclonecount[ii];
@@ -351,7 +351,7 @@ public class SPCGridStatic {
 			//if(c.type==1)growArray.add(c); // If cell is an SC, add to grow list
 			//if(c.canDetach)growArray.add(c);// If cell can detach add to grow list
 	    }
-		for(int ii=0;ii<maxlineage;ii++){
+		for(int ii=1;ii<maxlineage;ii++){
 			countcolonies = countcolonies+ colonies[ii];
 			countviable = countviable+ SCs[ii];
 			csc = cellclonecount[ii];
