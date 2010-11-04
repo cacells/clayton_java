@@ -19,7 +19,7 @@ public class SPCGridStatic {
 	private Random rand = new Random();
 	public static int maxlineage;//probably static is  unnecessary
 	public int gsize;
-	public static boolean writetogrid = false,precheck=true,migrateanywhere = true;;
+	public static boolean writetogrid = false,precheck=true,migrateanywhere = false;
 	public static boolean smallcolony=false,forcinggrow=false;
 	public int [] SCs,cellclonecount,clonesizecount;
 	public int SCcount=0;

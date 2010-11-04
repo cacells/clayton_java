@@ -152,8 +152,10 @@ public class SPCStaticBatch2 {
 		maxIters = 100;
 		SPCStaticBatch2 s;
 		switch(arglen){
+		case 7:
+			if (args[6].contains("read")) readgrid = true;
 		case 6:
-			if (args[5].contains("read")) readgrid = true;
+			if (args[5].contains("random")) SPCGridStatic.migrateanywhere = true;
 		case 5:
 			if (args[4].contains("force")) SPCGridStatic.forcinggrow = true;
 		case 4:

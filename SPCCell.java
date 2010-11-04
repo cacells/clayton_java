@@ -15,12 +15,14 @@ class SPCCell{
 	public int type; // 0 = space, 1 = EP, 2=PMB
 	public SPCBoxStatic home;// The box the cell sits in
 	public double stain;
-	public static double scRate=0.1;// Relative SC proliferation rate if scRate = 0.5 SC proliferation rate would be half SPC rate
+	public int age;
+	public static double scRate=0.33;// Relative SC proliferation rate if scRate = 0.5 SC proliferation rate would be half SPC rate
 	public int lineage;
 	
 	public static int[] cellcounts=new int[maxCycle+1];
 	public static int[] prolifcounts=new int[maxCycle+1];
 	public static double[] stainsums=new double[maxCycle+1];
+	public static double[] agesums=new double[maxCycle+1];
 	public static int totalproliferations=0;
 	
 	public SPCCell(SPCBoxStatic home,int lin){
@@ -31,6 +33,7 @@ class SPCCell{
 		proliferated=false;
 		isavail = false;
 		stain = 0.0;
+		age = 0;
 	}
 	
 	public static void resetstaticcounters(){
@@ -38,6 +41,7 @@ class SPCCell{
 			cellcounts[i]=0;
 			prolifcounts[i]=0;
 			stainsums[i]=0.0;
+			agesums[i]=0.0;
 			totalproliferations = 0;
 		}
 	}
@@ -52,6 +56,7 @@ class SPCCell{
 	public void maintainandcount(){// Determines if a Cell can detach or grow and counts
 		cellcounts[type]++;
 		stainsums[type] = stainsums[type] + stain;
+		agesums[type] = agesums[type] + age;
 		canDetach=(type==maxCycle);// For standard SPC model only PMB can detach
 		canGrow = (type==1);// For standard SPC model only EP can grow
 		isavail = (canDetach || (type==0));//PMB or space
@@ -76,6 +81,8 @@ class SPCCell{
 			cHold.proliferated=true;// The proliferating cell has proliferated
 			cHold.stain = cHold.stain/2.0;// Divide the label resting cell between the two cells
 			stain = cHold.stain;// As above
+			cHold.age = cHold.age + 1;// Divide the label resting cell between the two cells
+			age = cHold.age;// As above
 			lineage = cHold.lineage;// New cell takes on lineage of proliferating cell
 			isavail = false;
 	}
@@ -100,6 +107,8 @@ class SPCCell{
 		cHold.proliferated=true;// The proliferating cell has proliferated
 		cHold.stain = cHold.stain/2.0;// Divide the label resting cell between the two cells
 		stain = cHold.stain;// As above
+		cHold.age = cHold.age + 1;// Divide the label resting cell between the two cells
+		age = cHold.age;// As above
 		lineage = cHold.lineage;// New cell takes on lineage of proliferating cell 
 		isavail = false;
 	}
@@ -209,6 +218,7 @@ class SPCCell{
 		canGrow=false;// Proliferating cell will not proliferate again in this iteration
 		proliferated=true;// The proliferating cell has proliferated
 		stain = stain/2.0;// Divide the label resting cell between the two cells
+		age = age + 1;// Divide the label resting cell between the two cells
 	}
 	private boolean searchfurther(int n){
 		//System.out.print("forcing ");

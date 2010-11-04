@@ -11,7 +11,9 @@
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -44,11 +46,12 @@ public class SPCStatic extends JFrame implements Runnable {
     Color[] javaColours;
     double[][] epsColours;
     //Color[] colours = {Color.black,Color.white,Color.green,Color.blue,Color.yellow,Color.red,Color.pink};
-    boolean writeImages = false;
-    static int maxIters = 1000;
+    boolean writeImages = false,writetoGrid = true;
+    static int maxIters = 300,writefreq=10;
 	int lin=64*64;//max number of different cell lines equals cells in grid
 	double dlin = (double) lin;
 	public static boolean readgrid = false;
+	BufferedWriter bufGrid;
 
 
 	public SPCStatic(int size, int maxC, double frac) {
@@ -170,6 +173,35 @@ public class SPCStatic extends JFrame implements Runnable {
 	    //outputImage();
 	    CApicture.updateGraphic();
 	}
+	
+	public void openoutputfile(){
+		try{
+			bufGrid = new BufferedWriter(new FileWriter("allgrid.dat"));
+		}
+		catch(IOException e){
+			}
+	}
+	public void closeoutputfile(){
+		try{
+			bufGrid.close();
+			System.out.println("Finished writing grid");
+		}
+		catch(IOException e){
+			}
+	}
+	public void writeGrid(){
+		try{
+
+	        for (SPCCell c : experiment.tissue) { // loop through the tissue (ArrayList of cells)
+				bufGrid.write(c.home.x+" "+c.home.y+" "+c.type+" "+c.age+" "+c.lineage);
+				bufGrid.newLine();	
+		    }
+
+
+		}
+		catch(IOException e){
+		}
+	}
 
 	public void initialise(){
 			CApicture.setScale(gSize,gSize,scale,gSize,gSize,scale);
@@ -196,12 +228,13 @@ public class SPCStatic extends JFrame implements Runnable {
 			drawCALineage();
 			System.out.println("scRate "+SPCCell.scRate);
 			if (writeImages) CApicture.writeImage(0);
+			openoutputfile();
 			for(iterations=0; iterations<maxIters; iterations++){
 				if(iterations==0)experiment.stain();// stain all cells at start
 
 				experiment.iterateandcount_random(false);
 				progressBar.setValue(iterations);
-
+				if (iterations%writefreq==0)writeGrid();
 				if (iterations%2==0){
 					drawCA();
 					//either draw colonies:
@@ -217,6 +250,7 @@ public class SPCStatic extends JFrame implements Runnable {
 				//if((iterations%5)==0)postscriptPrint("SPC"+iterations+".eps");
 				// This will produce a postscript output of the tissue
 			}
+			closeoutputfile();
 		}
 	}
 
@@ -286,8 +320,10 @@ public class SPCStatic extends JFrame implements Runnable {
 		maxIters = 1000;
 		SPCStatic s;
 		switch(arglen){
+		case 7:
+			if (args[6].contains("read")) readgrid = true;
 		case 6:
-			if (args[5].contains("read")) readgrid = true;
+			if (args[5].contains("random")) SPCGridStatic.migrateanywhere = true;
 		case 5:
 			if (args[4].contains("force")) SPCGridStatic.forcinggrow = true;
 		case 4:
@@ -305,10 +341,15 @@ public class SPCStatic extends JFrame implements Runnable {
 			s = new SPCStatic(64, 1, initalSeed);
 			break;
 		default:
+			writefreq = (int) Math.round(1.0/SPCCell.scRate);
+			System.out.println("writefreq "+writefreq);
+			maxIters = 100*writefreq;
 			//maxiters set above, scrate set to 1 in spccell,force and small set in gridstatic.
+			SPCGridStatic.migrateanywhere = true;
 			SPCGridStatic.forcinggrow = true;
 			s = new SPCStatic(64, 1, 0.22);
 		}
+
 		s.start();
 //		if(arglen>0){
 //			initalSeed = Double.parseDouble(args[0]);
